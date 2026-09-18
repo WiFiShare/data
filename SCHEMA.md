@@ -44,23 +44,25 @@ its owner put it there.
 
 ## Fields
 
-`V` marks a field that appears only on owner-verified networks.
+`V` marks a field that appears only on owner-verified networks. The normative
+version is
+[`schemas/network.schema.json`](https://github.com/WiFiShare/spec/blob/main/schemas/network.schema.json).
 
 | Field | Type | | Meaning |
 | --- | --- | --- | --- |
-| `geometry.coordinates` | `[lon, lat]` | | Exact position for a verified network. For a community-found network, a position derived from the geohash-7 cell only, so it is not a measurement of where the router is. |
+| `geometry.coordinates` | `[lon, lat]` | | Exact position for a verified network. For a community-found network, the centre of the geohash-7 cell, so it is not a measurement of where the router is. |
+| `properties.id` | string | | A random 12-character id. It is not derived from the BSSID, the name or the position, and it is not reused. |
 | `properties.ssid` | string | | The network name, as broadcast. |
-| `properties.verified` | boolean | | `true` if the owner verified the network. Decides everything in the table above. |
-| `properties.geohash` | string | | The geohash cell the position stands for: 7 characters for a community-found network, and the cell is the real precision. |
-| `properties.precision_m` | number | | Nominal position precision in metres. About 150 for a community-found network. Read this before treating the coordinates as exact. |
-| `properties.bssid` | string | V | The access point's hardware address. Present only for owner-verified networks. Never present for a community-found one. |
-
-Fields beyond these — how a network is secured, whether joining it needs a
-captive portal or a code, what kind of venue it is, and what the apps need in
-order to offer a one-tap join — are being worked out in `spec` and are not
-settled yet. They are not listed here so that this page does not describe
-something that has not been agreed. Read the schemas in `spec` for the current
-state.
+| `properties.security` | `open`, `owe` or `shared` | | `shared` means the owner published a credential for an encrypted network. |
+| `properties.captive_portal` | `unknown`, `detected` or `none` | | Whether joining is likely to land on a login page. |
+| `properties.verification` | `community` or `owner-verified` | | Decides everything in the table above. |
+| `properties.cell` | string | | The geohash-7 cell the network sits in. For a community-found network this cell, not the point, is the real precision. |
+| `properties.precision_m` | `150` or `10` | | Nominal position precision in metres. Read this before treating the coordinates as exact. |
+| `properties.first_seen`, `properties.last_seen` | `YYYY-MM-DD` | | Day precision only, never a time of day. |
+| `properties.reports` | object | | `{ "works": n, "fails": n }`, how people found it. |
+| `properties.bssids` | array of string | V | The access point hardware addresses. Never present for a community-found network. |
+| `properties.venue` | object | V | `{ "name": ..., "kind": ... }` as given by the owner. |
+| `properties.credential` | object | V | Present only when the owner chose to publish it: `{ "type": ..., "secret": ..., "note": ... }`. |
 
 ## Reading the data safely
 
